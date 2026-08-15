@@ -187,10 +187,11 @@ async function startServer() {
     }
 
     const hasGemini = Boolean(process.env.GEMINI_API_KEY);
+    const hasXAI = Boolean(process.env.XAI_API_KEY);
     const dbStats = getDocumentStats();
     const userStats = getUsersStats();
 
-    const isHealthy = hasGemini && qdrantStatus === 'connected';
+    const isHealthy = hasGemini && hasXAI && qdrantStatus === 'connected';
 
     const healthData = {
       status: isHealthy ? 'healthy' : 'degraded',
@@ -201,9 +202,12 @@ async function startServer() {
       environment: process.env.NODE_ENV || 'development',
       requestId: req.id,
       services: {
+        xai: {
+          status: hasXAI ? 'configured' : 'missing_api_key',
+          model: 'grok-4.5',
+        },
         gemini: {
           status: hasGemini ? 'configured' : 'missing_api_key',
-          model: 'gemini-2.5-flash',
           embeddingModel: 'gemini-embedding-2',
         },
         qdrant: {
@@ -726,11 +730,10 @@ async function startServer() {
         ipAddress: ip,
       });
 
-      const client = getGeminiClient();
-      if (!client) {
+      if (!process.env.XAI_API_KEY) {
         return res.status(200).json({
           status: 'no_api_key',
-          message: 'Gemini API key is not configured in server environment.',
+          message: 'xAI API key is not configured in server environment for generation.',
         });
       }
 
@@ -773,24 +776,32 @@ async function startServer() {
         ip
       );
 
-      // Select model
-      let selectedModel = 'gemini-3.7-flash';
-      if (modelPreference === 'gemini-pro' || modelPreference === 'gemini-3.1-pro-preview') {
-        selectedModel = 'gemini-3.1-pro-preview';
-      }
-
+      const selectedModel = 'grok-4.5';
       const prompt = `${contextPrompt}\n\nUSER QUESTION:\n${message}\n\nPlease provide a grounded, cited answer based strictly on the context above.`;
 
-      const response = await client.models.generateContent({
-        model: selectedModel,
-        contents: prompt,
-        config: {
-          systemInstruction: GROUNDED_SYSTEM_INSTRUCTION,
-          temperature: 0.15, // Highly factual, strictly grounded
+      const xaiResponse = await fetch('https://api.x.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.XAI_API_KEY}`,
         },
+        body: JSON.stringify({
+          model: selectedModel,
+          messages: [
+            { role: 'system', content: GROUNDED_SYSTEM_INSTRUCTION },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.15,
+        }),
       });
 
-      const answer = response.text || 'No response generated.';
+      if (!xaiResponse.ok) {
+        const errText = await xaiResponse.text();
+        throw new Error(`xAI generation failed: ${xaiResponse.status} ${errText}`);
+      }
+
+      const xaiData = await xaiResponse.json();
+      const answer = xaiData.choices?.[0]?.message?.content || 'No response generated.';
 
       // Generate verified citations strictly matching included authorized chunks
       const citations = includedChunks.map((c, i) => ({
