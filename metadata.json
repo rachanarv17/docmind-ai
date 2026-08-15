@@ -1,0 +1,6 @@
+{
+  "name": "DocMind AI",
+  "description": "AI-Powered Document Intelligence Platform",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

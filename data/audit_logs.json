@@ -1,0 +1,26 @@
+[
+  {
+    "id": "audit_1786786476863_05zes9b",
+    "timestamp": 1786786476863,
+    "formattedDate": "15/8/2026, 3:04:36 pm",
+    "event": "REGISTER",
+    "severity": "INFO",
+    "userId": "usr_1786786476858_zzmpl6b",
+    "userEmail": "user@docmind.ai",
+    "details": {
+      "role": "USER"
+    }
+  },
+  {
+    "id": "audit_1786786476668_t6smgdo",
+    "timestamp": 1786786476668,
+    "formattedDate": "15/8/2026, 3:04:36 pm",
+    "event": "REGISTER",
+    "severity": "INFO",
+    "userId": "usr_1786786476663_kss2rjz",
+    "userEmail": "admin@docmind.ai",
+    "details": {
+      "role": "ADMIN"
+    }
+  }
+]

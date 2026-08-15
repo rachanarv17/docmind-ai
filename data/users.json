@@ -1,0 +1,22 @@
+{
+  "usr_1786786476663_kss2rjz": {
+    "id": "usr_1786786476663_kss2rjz",
+    "name": "Admin System",
+    "email": "admin@docmind.ai",
+    "passwordHash": "$2b$10$rmfD78BZEtEI2/BIMc4GdetScNYFmzN0PqTaz3v/4Va8HiSQ/IvKi",
+    "role": "ADMIN",
+    "status": "ACTIVE",
+    "createdAt": 1786786476663,
+    "updatedAt": 1786786476663
+  },
+  "usr_1786786476858_zzmpl6b": {
+    "id": "usr_1786786476858_zzmpl6b",
+    "name": "User Standard",
+    "email": "user@docmind.ai",
+    "passwordHash": "$2b$10$./Q0sLuCx5.RBxrTqdJ4aOtN3I3yBTmb1NMUu18L7dPR8aly62AM.",
+    "role": "USER",
+    "status": "ACTIVE",
+    "createdAt": 1786786476858,
+    "updatedAt": 1786786476858
+  }
+}
